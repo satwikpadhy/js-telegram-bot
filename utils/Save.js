@@ -96,6 +96,10 @@ const Save = async function(connString,bot,msg, spl) {
                     data = msg.reply_to_message.audio.file_id
                     type = "aud"
                 }
+                else if("voice" in msg.reply_to_message) {
+                    data = msg.reply_to_message.voice.file_id
+                    type = "voice"
+                }
                 console.log(`chatId = ${chatId}, notename = ${noteName}, data = ${data}, doctype = ${type}`)
                 writeDB(bot,connString,chatId,noteName,data,type)
             }
