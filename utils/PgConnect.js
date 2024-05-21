@@ -1,15 +1,15 @@
-// const { postgres } = require('pg')
-const postgres = require('pg').Client;
+const { postgres } = require('pg')
+// const postgres = require('pg').Client;
 require('dotenv').config()
 
-const PgConnect = new postgres({
+const PgConnect = new postgres.client({
     database : process.env.database,
     user : process.env.user,
     password : process.env.password,
     host : process.env.host,
     port : process.env.port
 });
-
+PgConnect.connect()
 module.exports = PgConnect
 
 /* running a query :
