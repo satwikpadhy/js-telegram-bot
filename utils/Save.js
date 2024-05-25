@@ -81,7 +81,6 @@ const Save = async function(bot,connString,msg, spl,encryptionKey) {
                 }
                 else if("text" in msg.reply_to_message) {
                     key = spl[1].concat(chatId).concat(encryptionKey)
-                    console.log(key)
                     data = CryptoJS.AES.encrypt(msg.reply_to_message.text, key)
                     type = "txt"
                 }

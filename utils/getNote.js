@@ -31,7 +31,6 @@ const getNote = function(bot,connString,chatId,spl,encryptionKey) {
                     }
                     else if(type == "txt") {
                         key = spl[1].concat(chatId).concat(encryptionKey)
-                        console.log(`Key = ${key}`)
                         const decryptedText = CryptoJS.AES.decrypt(fileId, key).toString(CryptoJS.enc.Utf8)
                         bot.sendMessage(chatId,`Here's the note named → ${noteName} : \n\n${decryptedText}`)
                     }
