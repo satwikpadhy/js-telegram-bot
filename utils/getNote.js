@@ -2,13 +2,13 @@ const postgres = require('pg').Client
 var CryptoJS = require("crypto-js");
 
 const getNote = function(bot,connString,chatId,spl) {
-    console.log('getNote called')
     if(spl.length === 1) {
+        console.log(`No notename specified by ${chatId}`)
         bot.sendMessage(chatId, "Please Specify the Notename")
     }
     else {
         noteName = spl[1]
-        console.log(`save called for chatId = ${chatId} and notename = ${noteName}`)
+        console.log(`/getNote called for chatId = ${chatId} and notename = ${noteName}`)
         const pg = new postgres(connString)
         const queryString = `select data, type from savednotes where chat_id = '${chatId}' and notename = '${noteName}'`
         pg.connect()
@@ -19,7 +19,6 @@ const getNote = function(bot,connString,chatId,spl) {
             })
             .then((result) => {
                 console.log('Query result:', result.rows);
-                console.log('Result rows length :', result.rows.length)
                 if(result.rows.length == 0) {
                     bot.sendMessage(chatId,"Note does not exist!")
                 }
