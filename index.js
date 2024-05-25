@@ -16,7 +16,7 @@ const connString = {
   port : process.env.port
 }
 
-
+encryptionKey = process.env.key
 
 bot.on('message', (msg) => {
   const chatId = msg.chat.id
@@ -37,11 +37,11 @@ bot.on('message', (msg) => {
     }
 
     else if(command == "/save") {
-        save(bot,connString,msg,spl)
+        save(bot,connString,msg,spl,encryptionKey)
     }  
 
     else if(command == "/get") {
-        getNote(bot,connString,chatId,spl)
+        getNote(bot,connString,chatId,spl,encryptionKey)
     }
     
     else if(command == "/notes") {
@@ -58,5 +58,5 @@ bot.on('callback_query' , (cq) => {
     messageId = cq.message.message_id
     // console.log(chatId,noteName)
     bot.deleteMessage(chatId,messageId)
-    getNote(bot,connString,chatId,spl)
+    getNote(bot,connString,chatId,spl,encryptionKey)
 })

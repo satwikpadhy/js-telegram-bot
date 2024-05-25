@@ -1,7 +1,7 @@
 const postgres = require('pg').Client
 var CryptoJS = require("crypto-js");
 
-const getNote = function(bot,connString,chatId,spl) {
+const getNote = function(bot,connString,chatId,spl,encryptionKey) {
     if(spl.length === 1) {
         console.log(`No notename specified by ${chatId}`)
         bot.sendMessage(chatId, "Please Specify the Notename")
@@ -30,7 +30,9 @@ const getNote = function(bot,connString,chatId,spl) {
                         bot.sendPhoto(chatId,fileId,options)
                     }
                     else if(type == "txt") {
-                        const decryptedText = CryptoJS.AES.decrypt(fileId, spl[1].concat(chatId).concat(connString)).toString(CryptoJS.enc.Utf8)
+                        key = spl[1].concat(chatId).concat(encryptionKey)
+                        console.log(`Key = ${key}`)
+                        const decryptedText = CryptoJS.AES.decrypt(fileId, key).toString(CryptoJS.enc.Utf8)
                         bot.sendMessage(chatId,`Here's the note named → ${noteName} : \n\n${decryptedText}`)
                     }
                     else if(type == "vid") {

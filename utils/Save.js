@@ -57,7 +57,7 @@ const writeDB = function(bot,connString,chatId, noteName, data, type) {
         });
 }
 
-const Save = async function(bot,connString,msg, spl) {
+const Save = async function(bot,connString,msg, spl,encryptionKey) {
     const chatId = msg.chat.id
     const userId = msg.from.id
     let data
@@ -80,7 +80,9 @@ const Save = async function(bot,connString,msg, spl) {
                     type = "img"
                 }
                 else if("text" in msg.reply_to_message) {
-                    data = CryptoJS.AES.encrypt(msg.reply_to_message.text, spl[1].concat(chatId).concat(connString))
+                    key = spl[1].concat(chatId).concat(encryptionKey)
+                    console.log(key)
+                    data = CryptoJS.AES.encrypt(msg.reply_to_message.text, key)
                     type = "txt"
                 }
                 else if("video" in msg.reply_to_message) {
