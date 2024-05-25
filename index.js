@@ -38,12 +38,12 @@ bot.on('message', (msg) => {
         bot.sendMessage(chatId, reply_text)
     }
 
-    else if(command == "/help") {
+    else if(command == "/help" || command ==`/help@${me.username}`) {
         reply_text = "Help functionality yet to be implemented."
         bot.sendMessage(bot,chatId, reply_text)
     }
 
-    else if(command == "/save") {
+    else if(command == "/save" || command == `/save@${me.username}`) {
         save(bot,connString,msg,spl,encryptionKey)
     }  
 
