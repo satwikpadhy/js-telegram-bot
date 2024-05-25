@@ -25,10 +25,9 @@ const updateDB = function(bot,connString,chatId, noteName, data, type) {
 }
 
 const writeDB = function(bot,connString,chatId, noteName, data, type) {
-    console.log(`save called for chatId = ${chatId} and notename = ${noteName}`)
+    console.log(`/save called for chatId = ${chatId} and notename = ${noteName}`)
     const pg = new postgres(connString)
     const queryString = `insert into savednotes values('${chatId}', '${noteName}', '${data}', '${type}')`
-    console.log(`query = ${queryString}`)
     pg.connect()
         .then(() => {
             console.log('Connected to the database')
@@ -68,7 +67,8 @@ const Save = async function(bot,connString,msg, spl) {
 	}
 	else {
         try {
-            noteName = spl[1]
+            //Replacing all single quotes with two single quotes so as to escape the single quote when putting it into the SQL
+            noteName = spl[1].replace(/\'/g, `''`) 
             const userRole = await bot.getChatMember(chatId, userId)
             const status = userRole.status
 
