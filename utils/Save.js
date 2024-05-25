@@ -1,4 +1,5 @@
 const postgres = require('pg').Client;
+var CryptoJS = require("crypto-js");
 
 const updateDB = function(bot,connString,chatId, noteName, data, type) {
     console.log("update db called")
@@ -57,7 +58,7 @@ const writeDB = function(bot,connString,chatId, noteName, data, type) {
         });
 }
 
-const Save = async function(connString,bot,msg, spl) {
+const Save = async function(bot,connString,msg, spl) {
     const chatId = msg.chat.id
     const userId = msg.from.id
     let data
@@ -69,7 +70,6 @@ const Save = async function(connString,bot,msg, spl) {
         try {
             noteName = spl[1]
             const userRole = await bot.getChatMember(chatId, userId)
-            console.log(userRole)
             const status = userRole.status
 
             if(status === 'administrator' || status === 'creator' || msg.chat.type === 'private') {
@@ -80,8 +80,7 @@ const Save = async function(connString,bot,msg, spl) {
                     type = "img"
                 }
                 else if("text" in msg.reply_to_message) {
-                    //Add encryption
-                    data = msg.reply_to_message.text
+                    data = CryptoJS.AES.encrypt(msg.reply_to_message.text, spl[1].concat(chatId).concat(connString))
                     type = "txt"
                 }
                 else if("video" in msg.reply_to_message) {
