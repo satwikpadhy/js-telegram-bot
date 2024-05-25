@@ -1,5 +1,6 @@
 const save = require('./utils/Save')
 const getNote = require('./utils/getNote')
+const notes = require('./utils/notes')
 require('dotenv').config()
 const TelegramBot = require('node-telegram-bot-api');
 
@@ -24,25 +25,38 @@ bot.on('message', (msg) => {
     const text = msg.text 
     spl = text.split(" ")
     command = spl[0]
-    // console.log("command =", command)
-    // console.log(msg.reply_to_message)
 
     if(command == "/start") {
         reply_text = "Hello I am @cruzex_bot. Send /help to get a list of commands."
         bot.sendMessage(chatId, reply_text)
     }
 
-    if(command == "/help") {
+    else if(command == "/help") {
         reply_text = "Help functionality yet to be implemented."
         bot.sendMessage(bot,chatId, reply_text)
     }
 
-    if(command == "/save") {
-		    save(connString,bot,msg,spl)
+    else if(command == "/save") {
+        save(bot,connString,msg,spl)
     }  
 
-    if(command == "/get") {
+    else if(command == "/get") {
         getNote(bot,connString,chatId,spl)
+    }
+    
+    else if(command == "/notes") {
+        notes(bot,connString,chatId)
     }
   }
 });
+
+bot.on('callback_query' , (cq) => {
+    chatId = cq.message.chat.id
+    noteName = cq.data
+    console.log(`Inside callback query block for chatId = ${chatId} and notename = ${noteName}`)
+    let spl = ['/get',noteName]
+    messageId = cq.message.message_id
+    // console.log(chatId,noteName)
+    bot.deleteMessage(chatId,messageId)
+    getNote(bot,connString,chatId,spl)
+})
