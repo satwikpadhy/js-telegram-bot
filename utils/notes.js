@@ -12,8 +12,8 @@ const notes = function(bot,connString,chatId) {
             })
             .then((result) => {
                 // console.log(result.rows)
-                if(result.rows.count == 0) {
-                    bot.sendMessage(chatId, "/save was never used in this chat")
+                if(result.rowCount == 0) {
+                    bot.sendMessage(chatId, "There are no saved notes in this chat. Use /save to get started")
                 }
                 else {
                     let rows = []

@@ -3,7 +3,7 @@ var CryptoJS = require("crypto-js");
 
 const getNote = function(bot,connString,chatId,spl,encryptionKey) {
     if(spl.length === 1) {
-        console.log(`No notename specified by ${chatId}`)
+        console.log(`No notename specified by ${chatId} for /get`)
         bot.sendMessage(chatId, "Please Specify the Notename")
     }
     else {

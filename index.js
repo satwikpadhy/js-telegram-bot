@@ -18,6 +18,12 @@ const connString = {
 }
 
 encryptionKey = process.env.key
+var me = ''
+const getMe = (async () => {
+    me = await bot.getMe()
+    console.log(me.username)
+})
+getMe()
 
 bot.on('message', (msg) => {
   const chatId = msg.chat.id
@@ -45,11 +51,11 @@ bot.on('message', (msg) => {
         getNote(bot,connString,chatId,spl,encryptionKey)
     }
     
-    else if(command == "/notes") {
+    else if(command == `/notes` || command == `/notes@${me.username}`) {
         notes(bot,connString,chatId)
     }
 
-    else if(command = '/delete') {
+    else if(command == '/delete') {
         deleteNote(bot,connString,msg,spl)
     }
   }

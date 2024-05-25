@@ -5,7 +5,7 @@ const deleteNote = async function(bot,connString,msg,spl) {
     const userId = msg.from.id
 
     if(spl.length === 1) {
-        console.log(`No notename specified by ${chatId}`)
+        console.log(`No notename specified by ${chatId} for /delete`)
         bot.sendMessage(chatId, "Please Specify the Notename")
     }
     else {
@@ -40,6 +40,9 @@ const deleteNote = async function(bot,connString,msg,spl) {
                         .then(() => console.log('Disconnected from the database'))
                         .catch((error) => console.error('Error disconnecting from the database:', error));
                     })
+            }
+            else {
+                bot.sendMessage(chatId, "Sorry, non-admins cannot use this command")
             }
         }
         catch(err) {
