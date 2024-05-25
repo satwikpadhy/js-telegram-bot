@@ -31,8 +31,15 @@ const notes = function(bot,connString,chatId) {
                     let text = 'Notes in this chat :'
                     bot.sendMessage(chatId, text, inlineKeyboardMarkup)
                 }
-
             })
+            .catch((error) => {
+                console.error('Error executing the "notes" query:', error);
+            })
+            .finally(() => {
+                pg.end()
+                .then(() => console.log('Disconnected from the database'))
+                .catch((error) => console.error('Error disconnecting from the database:', error));
+            });
 }
 
 module.exports = notes

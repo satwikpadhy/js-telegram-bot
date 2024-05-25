@@ -13,13 +13,12 @@ const connString = {
   }
 key = process.env.key
 
-const notes_table = process.env.notes_table
 
 const pg = new postgres(connString)
 
 pg.connect()
     .then(() => {
-        return pg.query(`select * from ${notes_table} where type = 'txt' and notename <> 'text'`)
+        return pg.query(`select * from savednotes where type = 'txt' and notename <> 'text'`)
     })
     .then((result) => {
         for(i=0; i<result.rows.length;i++) {

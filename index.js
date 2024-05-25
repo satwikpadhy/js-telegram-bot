@@ -1,6 +1,7 @@
 const save = require('./utils/Save')
 const getNote = require('./utils/getNote')
 const notes = require('./utils/notes')
+const deleteNote = require('./utils/deleteNote')
 require('dotenv').config()
 const TelegramBot = require('node-telegram-bot-api');
 
@@ -46,6 +47,10 @@ bot.on('message', (msg) => {
     
     else if(command == "/notes") {
         notes(bot,connString,chatId)
+    }
+
+    else if(command = '/delete') {
+        deleteNote(bot,connString,msg,spl)
     }
   }
 });

@@ -18,7 +18,6 @@ const getNote = function(bot,connString,chatId,spl,encryptionKey) {
                 return pg.query(queryString);
             })
             .then((result) => {
-                console.log('Query result:', result.rows);
                 if(result.rows.length == 0) {
                     bot.sendMessage(chatId,"Note does not exist!")
                 }
