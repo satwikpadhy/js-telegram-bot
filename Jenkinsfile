@@ -26,7 +26,7 @@ pipeline {
             steps {
                 echo 'Building Docker image...'
                 script {
-                    def appVersion = sh(script: "node -p 'require(\"./package.json\").version'", returnStdout: true).trim()
+                    appVersion = sh(script: "node -p 'require(\"./package.json\").version'", returnStdout: true).trim()
                     docker.build("${IMAGE_NAME}:${appVersion}")
                 }
                 echo 'Built Docker image Successfully...'
