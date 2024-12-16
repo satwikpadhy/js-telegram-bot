@@ -5,3 +5,5 @@ Here are the currently supported commands:
 2. /notes : list all the saved notes in the chat
 3. /get : syntax => /get notename : retrieve an existing note
 4. /delete : syntax => /delete notename : delete an existing note
+5. /pin : reply to a message with /pin to pin the message
+5. /unpin : reply to a message with /unpin to unpin the message
