@@ -26,7 +26,7 @@ pipeline {
             steps {
                 echo 'Building Docker image...'
                 script {
-                    def appVersion = sh(script: "node -p 'require(\"./package.json\").version'", returnStdout: true).trim()
+                    appVersion = sh(script: "node -p 'require(\"./package.json\").version'", returnStdout: true).trim()
                     docker.build("${IMAGE_NAME}:${appVersion}")
                 }
                 echo 'Built Docker image Successfully...'
@@ -65,7 +65,7 @@ pipeline {
                     def envVarsString = envVars.collect { "-e ${it}" }.join(' ')
 
 
-                    sh "docker run -d --restart unless-stopped --name $TARGET_CONTAINER_NAME ${envVarsString} ${IMAGE_NAME}"
+                    sh "docker run -d --restart unless-stopped --name $TARGET_CONTAINER_NAME ${envVarsString} ${IMAGE_NAME}:${appVersion}"
                 }
             }
         }
