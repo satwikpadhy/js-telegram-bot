@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                echo 'Checking out source code... Branchname = ' + env.BRANCH_NAME
+                echo 'Checking out source code... branch is ' + env.BRANCH_NAME
                 checkout scm
             }
         }
@@ -59,10 +59,10 @@ pipeline {
                     def envVarsString = envVars.collect { "-e ${it}" }.join(' ')
 
                     if (branchName == 'prod'){
-                        TARGET_CONTAINER_NAME = "${CONTAINER_NAME_DEV}"
+                        TARGET_CONTAINER_NAME = "${CONTAINER_NAME}"
                     }
                     else if(branchName == 'dev' || branchName == 'jenkins'){
-                        TARGET_CONTAINER_NAME = "${CONTAINER_NAME}"
+                        TARGET_CONTAINER_NAME = "${CONTAINER_NAME_DEV}"
                     }
 
                     sh """
