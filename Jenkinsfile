@@ -49,25 +49,22 @@ pipeline {
         stage('Deploy Container') {
             steps {
                 script {
-                    // Stop and remove the existing container
-                    sh """
-                    docker stop $CONTAINER_NAME || true
-                    docker rm $CONTAINER_NAME || true
-                    """
-
-                    // Start the new container with extracted environment variables
-                    def envVarsString = envVars.collect { "-e ${it}" }.join(' ')
-
+                    //Determine branch
                     if (branchName == 'prod'){
                         TARGET_CONTAINER_NAME = "${CONTAINER_NAME}"
                     }
                     else if(branchName == 'dev' || branchName == 'jenkins'){
                         TARGET_CONTAINER_NAME = "${CONTAINER_NAME_DEV}"
                     }
+                    // Stop and remove the existing container
+                    sh "docker stop $TARGET_CONTAINER_NAME || true"
+                    sh "docker rm $TARGET_CONTAINER_NAME || true"
 
-                    sh """
-                    docker run -d --restart unless-stopped --name $TARGET_CONTAINER_NAME ${envVarsString} ${IMAGE_NAME}
-                    """
+                    // Start the new container with extracted environment variables
+                    def envVarsString = envVars.collect { "-e ${it}" }.join(' ')
+
+
+                    sh "docker run -d --restart unless-stopped --name $TARGET_CONTAINER_NAME ${envVarsString} ${IMAGE_NAME}"
                 }
             }
         }
