@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent {label get_agent_label(env.BRANCH_NAME)}
 
     environment {
         IMAGE_NAME = "js-telegram-bot" // Replace with your Docker image name
@@ -41,7 +41,7 @@ pipeline {
                     if (branchName == 'prod'){
                         TARGET_CONTAINER_NAME = "${CONTAINER_NAME}"
                     }
-                    else if(branchName == 'dev' || branchName == 'jenkins'){
+                    else if(branchName == 'dev'){
                         TARGET_CONTAINER_NAME = "${CONTAINER_NAME_DEV}"
                     }
                     // Fetch environment variables from the existing container
@@ -80,3 +80,14 @@ pipeline {
         }
     }
 }
+
+def get_agent_label(branch_name) {
+        switch(branch_name) {
+            case 'dev':
+                return "cruzex-pi"
+            // case 'uat':
+            //     return ""
+            case 'prod':
+                return "cruzex-lenovo"
+        }
+    }
