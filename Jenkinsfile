@@ -49,6 +49,7 @@ pipeline {
         stage('Deploy Container') {
             steps {
                 script {
+                    def branchName = env.BRANCH_NAME
                     //Determine branch
                     if (branchName == 'prod'){
                         TARGET_CONTAINER_NAME = "${CONTAINER_NAME}"
