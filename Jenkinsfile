@@ -3,13 +3,14 @@ pipeline {
 
     environment {
         IMAGE_NAME = "js-telegram-bot" // Replace with your Docker image name
-        CONTAINER_NAME = "js-telegram-bot-dev"
+        CONTAINER_NAME_DEV = "js-telegram-bot-dev"
+        CONTAINER_NAME = "js-telegram-bot"
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                echo 'Checking out source code...'
+                echo 'Checking out source code...' + env.BRANCH_NAME
                 checkout scm
             }
         }
@@ -56,8 +57,16 @@ pipeline {
 
                     // Start the new container with extracted environment variables
                     def envVarsString = envVars.collect { "-e ${it}" }.join(' ')
+
+                    if (branchName == 'prod'){
+                        TARGET_CONTAINER_NAME = "${CONTAINER_NAME_DEV}"
+                    }
+                    else if(branchName == 'dev'){
+                        TARGET_CONTAINER_NAME = "${CONTAINER_NAME}"
+                    }
+
                     sh """
-                    docker run -d --restart unless-stopped --name $CONTAINER_NAME ${envVarsString} ${IMAGE_NAME}
+                    docker run -d --restart unless-stopped --name $TARGET_CONTAINER_NAME ${envVarsString} ${IMAGE_NAME}
                     """
                 }
             }
