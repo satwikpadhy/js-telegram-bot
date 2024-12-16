@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                echo 'Checking out source code...' + env.BRANCH_NAME
+                echo 'Checking out source code... Branchname = ' + env.BRANCH_NAME
                 checkout scm
             }
         }
@@ -61,7 +61,7 @@ pipeline {
                     if (branchName == 'prod'){
                         TARGET_CONTAINER_NAME = "${CONTAINER_NAME_DEV}"
                     }
-                    else if(branchName == 'dev'){
+                    else if(branchName == 'dev' || branchName == 'jenkins'){
                         TARGET_CONTAINER_NAME = "${CONTAINER_NAME}"
                     }
 
