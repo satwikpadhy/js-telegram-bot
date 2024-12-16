@@ -36,6 +36,13 @@ pipeline {
         stage('Retrieve Environment Variables') {
             steps {
                 script {
+                    //Determine branch
+                    if (branchName == 'prod'){
+                        TARGET_CONTAINER_NAME = "${CONTAINER_NAME}"
+                    }
+                    else if(branchName == 'dev' || branchName == 'jenkins'){
+                        TARGET_CONTAINER_NAME = "${CONTAINER_NAME_DEV}"
+                    }
                     // Fetch environment variables from the existing container
                     sh """
                     docker inspect --format='{{range .Config.Env}}{{println .}}{{end}}' $CONTAINER_NAME > env_vars.txt
@@ -50,13 +57,6 @@ pipeline {
             steps {
                 script {
                     def branchName = env.BRANCH_NAME
-                    //Determine branch
-                    if (branchName == 'prod'){
-                        TARGET_CONTAINER_NAME = "${CONTAINER_NAME}"
-                    }
-                    else if(branchName == 'dev' || branchName == 'jenkins'){
-                        TARGET_CONTAINER_NAME = "${CONTAINER_NAME_DEV}"
-                    }
                     // Stop and remove the existing container
                     sh "docker stop $TARGET_CONTAINER_NAME || true"
                     sh "docker rm $TARGET_CONTAINER_NAME || true"
