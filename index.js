@@ -2,14 +2,16 @@ const save = require('./utils/Save')
 const getNote = require('./utils/getNote')
 const notes = require('./utils/notes')
 const deleteNote = require('./utils/deleteNote')
+const pinMessage = require('./utils/pinMessage')
+const unpinMessage = require('./utils/unpinMessage')
 require('dotenv').config()
 const TelegramBot = require('node-telegram-bot-api');
 const fs = require('fs')
+var token = ''
+var connString = ''
 
-const token = process.env.token
-
-const bot = new TelegramBot(token, {polling: true})
-const connString = {
+token = process.env.token
+connString = {
     database : process.env.database,
     user : process.env.user,
     password : process.env.password,
@@ -17,10 +19,16 @@ const connString = {
     port : process.env.port
 }
 
+
+const bot = new TelegramBot(token, {polling: true})
+
+
 encryptionKey = process.env.key
 var me = ''
 const getMe = (async () => {
+    console.log("getting me")
     me = await bot.getMe()
+    console.log("Fetched Bot details successfully")
 })
 getMe()
 const helpText = fs.readFileSync('help.md').toString()
@@ -55,6 +63,14 @@ bot.on('message', (msg) => {
 
     else if(command == '/delete') {
         deleteNote(bot,connString,msg,spl)
+    }
+    
+    else if(command == '/pin') {
+        pinMessage(bot,msg)
+    }
+
+    else if(command == '/unpin') {
+        unpinMessage(bot,msg)
     }
   }
 });
