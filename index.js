@@ -9,25 +9,14 @@ const TelegramBot = require('node-telegram-bot-api');
 const fs = require('fs')
 var token = ''
 var connString = ''
-if(process.argv[2]=='dev') {
-    token = process.env.token_uat
-    connString = {
-        database : process.env.database_uat,
-        user : process.env.user,
-        password : process.env.password,
-        host : process.env.host,
-        port : process.env.port
-    }
-}
-else if(process.argv[2] == 'prod') {
-    token = process.env.token
-    connString = {
-        database : process.env.database,
-        user : process.env.user,
-        password : process.env.password,
-        host : process.env.host,
-        port : process.env.port
-    }
+
+token = process.env.token
+connString = {
+    database : process.env.database,
+    user : process.env.user,
+    password : process.env.password,
+    host : process.env.host,
+    port : process.env.port
 }
 
 
@@ -39,6 +28,7 @@ var me = ''
 const getMe = (async () => {
     console.log("getting me")
     me = await bot.getMe()
+    console.log("Fetched Bot details successfully")
 })
 getMe()
 const helpText = fs.readFileSync('help.md').toString()

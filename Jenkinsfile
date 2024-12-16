@@ -57,7 +57,7 @@ pipeline {
                     // Start the new container with extracted environment variables
                     def envVarsString = envVars.collect { "-e ${it}" }.join(' ')
                     sh """
-                    docker run -d --name $CONTAINER_NAME ${envVarsString} ${IMAGE_NAME}
+                    docker run -d --restart unless-stopped --name $CONTAINER_NAME ${envVarsString} ${IMAGE_NAME}
                     """
                 }
             }
