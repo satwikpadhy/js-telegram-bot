@@ -45,7 +45,7 @@ pipeline {
                     }
                     // Fetch environment variables from the existing container
                     sh """
-                    docker inspect --format='{{range .Config.Env}}{{println .}}{{end}}' $CONTAINER_NAME > env_vars.txt
+                    docker inspect --format='{{range .Config.Env}}{{println .}}{{end}}' $TARGET_CONTAINER_NAME > env_vars.txt
                     """
                     envVars = readFile('env_vars.txt').split('\n').findAll { it.trim() }
                     echo "Extracted Environment Variables: ${envVars}"
