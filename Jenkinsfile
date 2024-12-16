@@ -65,7 +65,7 @@ pipeline {
                     def envVarsString = envVars.collect { "-e ${it}" }.join(' ')
 
 
-                    sh "docker run -d --restart unless-stopped --name $TARGET_CONTAINER_NAME ${envVarsString} ${IMAGE_NAME}"
+                    sh "docker run -d --restart unless-stopped --name $TARGET_CONTAINER_NAME ${envVarsString} ${IMAGE_NAME}:${appVersion}"
                 }
             }
         }
