@@ -37,6 +37,7 @@ pipeline {
             steps {
                 script {
                     //Determine branch
+                    def branchName = env.BRANCH_NAME
                     if (branchName == 'prod'){
                         TARGET_CONTAINER_NAME = "${CONTAINER_NAME}"
                     }
@@ -56,7 +57,6 @@ pipeline {
         stage('Deploy Container') {
             steps {
                 script {
-                    def branchName = env.BRANCH_NAME
                     // Stop and remove the existing container
                     sh "docker stop $TARGET_CONTAINER_NAME || true"
                     sh "docker rm $TARGET_CONTAINER_NAME || true"
