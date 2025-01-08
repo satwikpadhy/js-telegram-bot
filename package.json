@@ -4,8 +4,7 @@
   "description": "A port of my python telegram bot",
   "main": "index.js",
   "scripts": {
-    "test": "node index.js dev",
-    "prod": "node index.js prod",
+    "start": "node index.js",
     "convert": "node convert.js"
   },
   "repository": {
