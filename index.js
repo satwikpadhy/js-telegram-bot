@@ -4,6 +4,7 @@ const notes = require('./utils/notes')
 const deleteNote = require('./utils/deleteNote')
 const pinMessage = require('./utils/pinMessage')
 const unpinMessage = require('./utils/unpinMessage')
+const userManagement = require('./utils/userManagement')
 require('dotenv').config()
 const TelegramBot = require('node-telegram-bot-api');
 const fs = require('fs')
@@ -71,6 +72,18 @@ bot.on('message', (msg) => {
 
     else if(command == '/unpin') {
         unpinMessage(bot,msg)
+    }
+    else if(command == '/ban') {
+        userManagement.banUser(bot,msg)
+    }
+    else if(command == '/unban') {
+        userManagement.unbanUser(bot,msg)
+    }
+    else if(command == '/warn') {
+        userManagement.warnUser(bot, msg)
+    }
+    else if(command == '/unwarn') {
+        userManagement.unwarnUser(bot, msg)
     }
   }
 });
