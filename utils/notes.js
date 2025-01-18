@@ -3,7 +3,7 @@ const postgres = require('pg').Client
 const notes = function(bot,connString,chatId) {
     console.log(`/notes called for ${chatId}`)
     const pg = new postgres(connString)
-    const queryString = `select * from savednotes where chat_id = '${chatId}' order by notename`
+    const queryString = `select * from savednotes where chat_id = '${chatId}' order by lower(notename)`
     pg.connect()
             .then(() => {
                 console.log('Connected to the database');
