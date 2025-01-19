@@ -80,10 +80,10 @@ bot.on('message', (msg) => {
         userManagement.unbanUser(bot,msg)
     }
     else if(command == '/warn') {
-        userManagement.warnUser(bot, msg)
+        userManagement.warnUser(bot,connString,msg)
     }
     else if(command == '/unwarn') {
-        userManagement.unwarnUser(bot, msg)
+        userManagement.removeWarn(bot,connString,msg)
     }
   }
 });

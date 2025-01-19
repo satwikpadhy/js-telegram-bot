@@ -20,6 +20,9 @@ const updateDB = function(bot,connString,chatId, noteName, data, type) {
             console.error('Error executing update query:', error)
         })
         .finally(() => {
+            pg.end()
+                .then(() => console.log('Disconnected from the database'))
+                .catch((error) => console.error('Error disconnecting from the database:', error));
             console.log("Exiting WriteDB Function")
         });
 }
@@ -53,6 +56,9 @@ const writeDB = function(bot,connString,chatId, noteName, data, type) {
             }
         })
         .finally(() => {
+            pg.end()
+                .then(() => console.log('Disconnected from the database'))
+                .catch((error) => console.error('Error disconnecting from the database:', error));
             console.log("Exiting WriteDB Function")
         });
 }
