@@ -58,10 +58,10 @@ pipeline {
             steps {
                 script {
                     // Stop and remove the existing container
-                    OLD_IMAGE_ID = sh(script: "docker inspect --format='{{.Config.Image}}' $TARGET_CONTAINER_NAME", returnStdout: true).trim()
+                    OLD_IMAGE_ID = sh(script: "docker inspect --format='{{.Image}}' $TARGET_CONTAINER_NAME", returnStdout: true).trim()
                     sh "docker stop $TARGET_CONTAINER_NAME || true"
                     sh "docker rm $TARGET_CONTAINER_NAME || true"
-                    sh "docker image rm $OLD_IMAGE_ID"
+                    sh "docker image rm $OLD_IMAGE_ID || true"
 
                     // Start the new container with extracted environment variables
                     def envVarsString = envVars.collect { "-e ${it}" }.join(' ')
