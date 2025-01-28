@@ -58,7 +58,7 @@ pipeline {
             steps {
                 script {
                     // Stop and remove the existing container
-                    OLD_IMAGE_ID = sh(script: "docker ps --filter \"name=$TARGET_CONTAINER_NAME\" --format "{{.ID}}"", returnStdout: true).trim()
+                    OLD_IMAGE_ID = sh(script: "docker ps --filter \"name=$TARGET_CONTAINER_NAME\" --format \"{{.ID}}\"", returnStdout: true).trim()
                     sh "docker image rm $OLD_IMAGE_ID"
                     sh "docker stop $TARGET_CONTAINER_NAME || true"
                     sh "docker rm $TARGET_CONTAINER_NAME || true"
