@@ -7,6 +7,7 @@ const userManagement = require('./utils/userManagement')
 require('dotenv').config()
 const TelegramBot = require('node-telegram-bot-api');
 const fs = require('fs')
+const express = require('express')
 var token = ''
 var connString = ''
 
@@ -32,6 +33,43 @@ const getMe = (async () => {
 })
 getMe()
 const helpText = fs.readFileSync('help.md').toString()
+
+//Health Check implementation
+
+const app = express();
+const PORT = process.env.PORT || 8321;
+app.use(express.json());
+
+app.get('/health', (req, res) => {
+    try {
+        // Check if bot is connected
+        if (bot && me) {
+            res.status(200).json({
+                status: 'healthy',
+                timestamp: new Date().toISOString(),
+                bot_username: me.username,
+                uptime: process.uptime()
+            });
+        } else {
+            res.status(503).json({
+                status: 'unhealthy',
+                timestamp: new Date().toISOString(),
+                message: 'Bot not initialized'
+            });
+        }
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            timestamp: new Date().toISOString(),
+            message: error.message
+        });
+    }
+});
+
+// Start Express server
+app.listen(PORT, () => {
+    console.log(`Health check server running on port ${PORT}`);
+});
 
 bot.on('message', (msg) => {
   const chatId = msg.chat.id
