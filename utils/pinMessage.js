@@ -35,7 +35,7 @@ const unpinMessage = async function(bot,msg) {
     if(status === 'administrator' || status === 'creator' || msg.chat.type === 'private') {
         bot.unpinChatMessage(msg.chat.id)
             .then(() =>{
-                bot.sendMessage(msg.chat.id,"Message unPinned Successfully!")
+                bot.sendMessage(msg.chat.id,"Message Unpinned Successfully!")
             })
             .catch((error) => {
                 console.error('Error unpinning the message:', error);
