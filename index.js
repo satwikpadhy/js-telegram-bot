@@ -110,17 +110,24 @@ bot.on('message', (msg) => {
     else if(command == '/unpin') {
         pinMessage.unpinMessage(bot,msg)
     }
-    else if(command == '/ban') {
-        userManagement.banUser(bot,msg)
-    }
-    else if(command == '/unban') {
-        userManagement.unbanUser(bot,msg)
-    }
-    else if(command == '/warn') {
-        userManagement.warnUser(bot,connString,msg)
-    }
-    else if(command == '/unwarn') {
-        userManagement.removeWarn(bot,connString,msg)
+
+    else if(msg.chat.type != 'private') {
+
+        if(command == '/ban') {
+            userManagement.banUser(bot,msg)
+        }
+        
+        else if(command == '/unban') {
+            userManagement.unbanUser(bot,msg)
+        }
+
+        else if(command == '/warn') {
+            userManagement.warnUser(bot,connString,msg)
+        }
+
+        else if(command == '/unwarn') {
+            userManagement.removeWarn(bot,connString,msg)
+        }
     }
   }
 });
