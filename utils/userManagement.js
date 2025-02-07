@@ -6,14 +6,22 @@ const banUser = async function(bot,msg) {
     const userRole = await bot.getChatMember(chat_id, userId)
     const status = userRole.status
 
-    if(status === 'administrator' || status === 'creator' || msg.chat.type === 'private') {
+    if(status === 'administrator' || status === 'creator') {
         try {
             to_ban_id = msg.reply_to_message.from.id
-            bot.banChatMember(chat_id, to_ban_id)
-            .then(() => {
-                console.log("User banned successfully")
-                bot.sendMessage(chat_id, "User banned successfully")
-            })
+            to_ban_role = await bot.getChatMember(chat_id, to_ban_id)
+            to_ban_status = to_ban_role.status
+            if(to_ban_status === 'administrator' || to_ban_status === 'creator') {
+                bot.sendMessage(chat_id, "Ah!! These admins are too powerful for me")
+            }
+            else {
+                bot.banChatMember(chat_id, to_ban_id)
+                    .then(() => {
+                        console.log("User banned successfully")
+                        bot.sendMessage(chat_id, "User banned successfully")
+                    })
+            }
+            
         }
         catch {
             bot.sendMessage(chat_id,"Please reply to a message of the offender")
@@ -30,7 +38,7 @@ const unbanUser = async function(bot,msg) {
     const userRole = await bot.getChatMember(chat_id, userId)
     const status = userRole.status
 
-    if(status === 'administrator' || status === 'creator' || msg.chat.type === 'private') {
+    if(status === 'administrator' || status === 'creator') {
         try {
             to_ban_id = msg.reply_to_message.from.id
             bot.unbanChatMember(chat_id, to_ban_id)
@@ -54,46 +62,54 @@ const warnUser = async function(bot,connString,msg) {
     const userRole = await bot.getChatMember(chat_id, userId)
     const status = userRole.status
 
-    if(status === 'administrator' || status === 'creator' || msg.chat.type === 'private') {
+    if(status === 'administrator' || status === 'creator') {
         const pg = new postgres(connString)
         try {
             const user_id = msg.reply_to_message.from.id;
-            try {
-                await pg.connect();
-    
-                // Increment warning count or insert new record
-                const result = await pg.query(`
-                    INSERT INTO user_warnings (chat_id, user_id, warn_count)
-                    VALUES ($1, $2, 1)
-                    ON CONFLICT (chat_id, user_id)
-                    DO UPDATE SET warn_count = user_warnings.warn_count + 1
-                    RETURNING warn_count
-                `, [chat_id, user_id]);
-    
-                const warnCount = result.rows[0].warn_count;
-    
-                if (warnCount >= 3) {
-                    // Reset warnings and ban user
-                    await pg.query(`
-                        UPDATE user_warnings 
-                        SET warn_count = 0 
-                        WHERE chat_id = $1 AND user_id = $2
-                    `, [chat_id, user_id]);
-    
-                    await bot.banChatMember(chat_id, user_id);
-                    await bot.sendMessage(chat_id, 
-                        `User has been banned after receiving ${warnCount} warnings.`);
-                } else {
-                    await bot.sendMessage(chat_id, 
-                        `Warning ${warnCount}/3 has been issued to the user.`);
-                }
-    
-            } catch (error) {
-                console.error('Error in warnUser:', error);
-                await bot.sendMessage(chat_id, 'Error processing warning.');
-            } finally {
-                await pg.end();
+            to_ban_role = await bot.getChatMember(chat_id, user_id)
+            to_ban_status = to_ban_role.status
+            if(to_ban_status === 'administrator' || to_ban_ === 'creator') {
+                bot.sendMessage(chat_id, "Ah!! These admins are too powerful for me")
             }
+            else {
+                try {
+                    await pg.connect();
+        
+                    // Increment warning count or insert new record
+                    const result = await pg.query(`
+                        INSERT INTO user_warnings (chat_id, user_id, warn_count)
+                        VALUES ($1, $2, 1)
+                        ON CONFLICT (chat_id, user_id)
+                        DO UPDATE SET warn_count = user_warnings.warn_count + 1
+                        RETURNING warn_count
+                    `, [chat_id, user_id]);
+        
+                    const warnCount = result.rows[0].warn_count;
+        
+                    if (warnCount >= 3) {
+                        // Reset warnings and ban user
+                        await pg.query(`
+                            UPDATE user_warnings 
+                            SET warn_count = 0 
+                            WHERE chat_id = $1 AND user_id = $2
+                        `, [chat_id, user_id]);
+        
+                        await bot.banChatMember(chat_id, user_id);
+                        await bot.sendMessage(chat_id, 
+                            `User has been banned after receiving ${warnCount} warnings.`);
+                    } else {
+                        await bot.sendMessage(chat_id, 
+                            `Warning ${warnCount}/3 has been issued to the user.`);
+                    }
+        
+                } catch (error) {
+                    console.error('Error in warnUser:', error);
+                    await bot.sendMessage(chat_id, 'Error processing warning.');
+                } finally {
+                    await pg.end();
+                }    
+            }
+            
         }
         catch {
             bot.sendMessage(chat_id,"Please reply to a message of the offender")
@@ -111,7 +127,7 @@ const removeWarn = async function(bot,connString,msg) {
     const status = userRole.status
     try {
         const user_id = msg.reply_to_message.from.id;
-        if(status === 'administrator' || status === 'creator' || msg.chat.type === 'private') {
+        if(status === 'administrator' || status === 'creator') {
             const pg = new postgres(connString)
     
             try {

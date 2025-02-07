@@ -38,7 +38,8 @@ const unpinMessage = async function(bot,msg) {
                 bot.sendMessage(msg.chat.id,"Message Unpinned Successfully!")
             })
             .catch((error) => {
-                console.error('Error unpinning the message:', error);
+                // console.error('Error unpinning the message:', error);
+                bot.sendMessage(msg.chat.id, "Error in unpinning the message. Perhaps there was no message to unpin?")
             })
     }
     else {
