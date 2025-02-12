@@ -7,7 +7,7 @@ const banUser = async function(bot,msg) {
     const status = userRole.status
 
     if(status === 'administrator' || status === 'creator') {
-        try {
+        if(msg.reply_to_message) {
             to_ban_id = msg.reply_to_message.from.id
             to_ban_role = await bot.getChatMember(chat_id, to_ban_id)
             to_ban_status = to_ban_role.status
@@ -23,7 +23,7 @@ const banUser = async function(bot,msg) {
             }
             
         }
-        catch {
+        else {
             bot.sendMessage(chat_id,"Please reply to a message of the offender")
         }
     }
@@ -39,15 +39,39 @@ const unbanUser = async function(bot,msg) {
     const status = userRole.status
 
     if(status === 'administrator' || status === 'creator') {
-        try {
+        if(msg.reply_to_message) {
             to_ban_id = msg.reply_to_message.from.id
-            bot.unbanChatMember(chat_id, to_ban_id)
+            bot.unbanChatMember(chat_id, to_ban_id, {only_if_banned: true})
             .then(() => {
                 console.log("User unbanned successfully")
                 bot.sendMessage(chat_id, "User unbanned successfully")
             })
         }
-        catch {
+        else {
+            bot.sendMessage(chat_id,"Please reply to a message of the offender")
+        }
+    }
+    else {
+        bot.sendMessage(chat_id, "Sorry, non-admins cannot use this command")
+    }
+}
+
+const kickUser = async function(bot,msg) {
+    chat_id = msg.chat.id
+    const userId = msg.from.id
+    const userRole = await bot.getChatMember(chat_id, userId)
+    const status = userRole.status
+
+    if(status === 'administrator' || status === 'creator') {
+        if(msg.reply_to_message) {
+            to_ban_id = msg.reply_to_message.from.id
+            bot.unbanChatMember(chat_id, to_ban_id)
+            .then(() => {
+                console.log("User kicked successfully")
+                bot.sendMessage(chat_id, "User kicked successfully")
+            })
+        }
+        else {
             bot.sendMessage(chat_id,"Please reply to a message of the offender")
         }
     }
@@ -64,11 +88,11 @@ const warnUser = async function(bot,connString,msg) {
 
     if(status === 'administrator' || status === 'creator') {
         const pg = new postgres(connString)
-        try {
+        if(msg.reply_to_message) {
             const user_id = msg.reply_to_message.from.id;
             to_ban_role = await bot.getChatMember(chat_id, user_id)
             to_ban_status = to_ban_role.status
-            if(to_ban_status === 'administrator' || to_ban_ === 'creator') {
+            if(to_ban_status === 'administrator' || to_ban_status === 'creator') {
                 bot.sendMessage(chat_id, "Ah!! These admins are too powerful for me")
             }
             else {
@@ -111,7 +135,7 @@ const warnUser = async function(bot,connString,msg) {
             }
             
         }
-        catch {
+        else {
             bot.sendMessage(chat_id,"Please reply to a message of the offender")
         }
     }
@@ -125,9 +149,9 @@ const removeWarn = async function(bot,connString,msg) {
     const userId = msg.from.id
     const userRole = await bot.getChatMember(chat_id, userId)
     const status = userRole.status
-    try {
-        const user_id = msg.reply_to_message.from.id;
-        if(status === 'administrator' || status === 'creator') {
+    if(status === 'administrator' || status === 'creator') {
+        if(msg.reply_to_message) {
+            const user_id = msg.reply_to_message.from.id;
             const pg = new postgres(connString)
     
             try {
@@ -155,11 +179,11 @@ const removeWarn = async function(bot,connString,msg) {
             }
         }
         else {
-            bot.sendMessage(chat_id, "Sorry, non-admins cannot use this command")
+            bot.sendMessage(chat_id,"Please reply to a message of the offender")
         }
     }
-    catch {
-        bot.sendMessage(chat_id,"Please reply to a message of the offender")
+    else {
+        bot.sendMessage(chat_id, "Sorry, non-admins cannot use this command")
     }
 }
 
@@ -167,5 +191,6 @@ module.exports = {
     banUser, 
     unbanUser,
     warnUser,
-    removeWarn
+    removeWarn,
+    kickUser
 }

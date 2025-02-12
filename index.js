@@ -128,6 +128,10 @@ bot.on('message', (msg) => {
         else if(command == '/unwarn') {
             userManagement.removeWarn(bot,connString,msg)
         }
+        
+        else if(command == '/kick') {
+            userManagement.kickUser(bot,msg)
+        }
     }
   }
 });
