@@ -11,3 +11,4 @@ Here are the currently supported commands:
 8. /unban : unban a user from chat
 9. /warn : warn an user in the chat. user gets banned after 3 warns
 10. /unwarn : remove warn from an user
+11. /kick : kick user from the group
