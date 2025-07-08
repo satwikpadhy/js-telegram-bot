@@ -8,6 +8,7 @@ require('dotenv').config()
 const TelegramBot = require('node-telegram-bot-api');
 const fs = require('fs')
 const express = require('express')
+const postgres = require('pg').Client
 var token = ''
 var connString = ''
 
@@ -26,12 +27,16 @@ const bot = new TelegramBot(token, {polling: true})
 
 encryptionKey = process.env.key
 var me = ''
-const getMe = (async () => {
-    console.log("getting me")
-    me = await bot.getMe()
-    console.log("Fetched Bot details successfully")
+const getMe = (async (zone) => {
+    if(zone === "init") {
+        console.log("getting me")
+    }
+        me = await bot.getMe()
+    if(zone === "init") {
+        console.log("Fetched Bot details successfully")
+    }
 })
-getMe()
+getMe("init")
 const helpText = fs.readFileSync('help.md').toString()
 
 //Health Check implementation
@@ -43,20 +48,45 @@ app.use(express.json());
 app.get('/health', (req, res) => {
     try {
         // Check if bot is connected
+        getMe("healthCheck")
+        
+        // Check if pg connection is working
+        const pg = new postgres(connString)
+        const queryString = `select count(*) from savednotes`
         if (bot && me) {
-            res.status(200).json({
-                status: 'healthy',
-                timestamp: new Date().toISOString(),
-                bot_username: me.username,
-                uptime: process.uptime()
-            });
-        } else {
-            res.status(503).json({
-                status: 'unhealthy',
-                timestamp: new Date().toISOString(),
-                message: 'Bot not initialized'
-            });
+            pg.connect()
+                .then(() => {
+                    // console.log("Connected to the database")
+                    return pg.query(queryString)
+                })
+                .then((result) => {
+                    // console.log(result.rows)
+                    // if (bot && me) {
+                    res.status(200).json({
+                        status: 'healthy',
+                        timestamp: new Date().toISOString(),
+                        bot_username: me.username,
+                        uptime: process.uptime() + " seconds"
+                        // pg_result: result.rows
+                    });
+                })
+                .catch((error) => {
+                    // console.error('Error executing the healthcheck query:', error);
+                    res.status(503).json({
+                            status: 'unhealthy',
+                            timestamp: new Date().toISOString(),
+                            message: 'Postgres connection error' + error
+                        });
+                })
         }
+        else {
+                res.status(503).json({
+                    status: 'unhealthy',
+                    timestamp: new Date().toISOString(),
+                    message: 'Bot not initialized'
+                });
+        }
+        
     } catch (error) {
         res.status(500).json({
             status: 'error',
