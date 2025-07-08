@@ -78,6 +78,11 @@ app.get('/health', (req, res) => {
                             message: 'Postgres connection error' + error
                         });
                 })
+                .finally(() => {
+                        pg.end()
+                        // .then(() => console.log('Disconnected from the database'))
+                        // .catch((error) => console.error('Error disconnecting from the database:', error));
+                    });
         }
         else {
                 res.status(503).json({
@@ -94,6 +99,7 @@ app.get('/health', (req, res) => {
             message: error.message
         });
     }
+
 });
 
 // Start Express server
