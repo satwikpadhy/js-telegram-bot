@@ -80,8 +80,8 @@ app.get('/health', (req, res) => {
                 })
                 .finally(() => {
                         pg.end()
-                        // .then(() => console.log('Disconnected from the database'))
-                        // .catch((error) => console.error('Error disconnecting from the database:', error));
+                            // .then(() => console.log('Disconnected from the database'))
+                            .catch((error) => console.error('Error disconnecting from the database:', error));
                     });
         }
         else {

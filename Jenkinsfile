@@ -5,6 +5,8 @@ pipeline {
         IMAGE_NAME = "js-telegram-bot" // Replace with your Docker image name
         CONTAINER_NAME_DEV = "js-telegram-bot-dev"
         CONTAINER_NAME = "js-telegram-bot"
+        DEV_HEALTHCHECK_PORT = "8321"
+        PROD_HEALTHCHECK_PORT = "8321"
     }
 
     stages {
@@ -66,8 +68,15 @@ pipeline {
                     // Start the new container with extracted environment variables
                     def envVarsString = envVars.collect { "-e ${it}" }.join(' ')
 
-
-                    sh "docker run -d --restart unless-stopped --name $TARGET_CONTAINER_NAME ${envVarsString} ${IMAGE_NAME}:${appVersion}"
+                    if (branchName == 'prod'){
+                        // TARGET_CONTAINER_NAME = "${CONTAINER_NAME}"
+                        sh "docker run -d -p ${PROD_HEALTHCHECK_PORT}:${PROD_HEALTHCHECK_PORT} --restart unless-stopped --name $TARGET_CONTAINER_NAME ${envVarsString} ${IMAGE_NAME}:${appVersion}"
+                    }
+                    else if(branchName == 'dev'){
+                        // TARGET_CONTAINER_NAME = "${CONTAINER_NAME_DEV}"
+                        sh "docker run -d -p ${DEV_HEALTHCHECK_PORT}:${DEV_HEALTHCHECK_PORT} --restart unless-stopped --name $TARGET_CONTAINER_NAME ${envVarsString} ${IMAGE_NAME}:${appVersion}"
+                    }
+                    // sh "docker run -d --restart unless-stopped --name $TARGET_CONTAINER_NAME ${envVarsString} ${IMAGE_NAME}:${appVersion}"
                 }
             }
         }
