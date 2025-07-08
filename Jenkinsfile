@@ -67,6 +67,7 @@ pipeline {
 
                     // Start the new container with extracted environment variables
                     def envVarsString = envVars.collect { "-e ${it}" }.join(' ')
+                    def branchName = env.BRANCH_NAME
 
                     if (branchName == 'prod'){
                         // TARGET_CONTAINER_NAME = "${CONTAINER_NAME}"
