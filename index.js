@@ -67,7 +67,7 @@ app.get('/health', (req, res) => {
                         timestamp: new Date().toISOString(),
                         bot_username: me.username,
                         uptime: process.uptime() + " seconds"
-                        // pg_result: result.rows
+                        pg_result: result.rows
                     });
                 })
                 .catch((error) => {
