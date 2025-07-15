@@ -66,7 +66,7 @@ app.get('/health', (req, res) => {
                         status: 'healthy',
                         timestamp: new Date().toISOString(),
                         bot_username: me.username,
-                        uptime: process.uptime() + " seconds"
+                        uptime: process.uptime() + " seconds",
                         pg_result: result.rows
                     });
                 })
