@@ -1,6 +1,7 @@
 const save = require('./utils/Save')
 const getNote = require('./utils/getNote')
 const notes = require('./utils/notes')
+const formatUptime = require('./utils/formatUptime')
 const deleteNote = require('./utils/deleteNote')
 const pinMessage = require('./utils/pinMessage')
 const userManagement = require('./utils/userManagement')
@@ -52,26 +53,22 @@ app.get('/health', (req, res) => {
         
         // Check if pg connection is working
         const pg = new postgres(connString)
-        const queryString = `select count(*) from savednotes`
+        const queryString = `SELECT 1`
         if (bot && me) {
             pg.connect()
                 .then(() => {
                     // console.log("Connected to the database")
                     return pg.query(queryString)
                 })
-                .then((result) => {
-                    // console.log(result.rows)
-                    // if (bot && me) {
+                .then(() => {
                     res.status(200).json({
                         status: 'healthy',
                         timestamp: new Date().toISOString(),
                         bot_username: me.username,
-                        uptime: process.uptime() + " seconds",
-                        pg_result: result.rows
+                        uptime: formatUptime(process.uptime())
                     });
                 })
                 .catch((error) => {
-                    // console.error('Error executing the healthcheck query:', error);
                     res.status(503).json({
                             status: 'unhealthy',
                             timestamp: new Date().toISOString(),
@@ -80,7 +77,6 @@ app.get('/health', (req, res) => {
                 })
                 .finally(() => {
                         pg.end()
-                            // .then(() => console.log('Disconnected from the database'))
                             .catch((error) => console.error('Error disconnecting from the database:', error));
                     });
         }
