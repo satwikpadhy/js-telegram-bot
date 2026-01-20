@@ -1,6 +1,4 @@
-const postgres = require('pg').Client
-
-const deleteNote = async function(bot,connString,msg,spl) {
+const deleteNote = async function(bot,pool,msg,spl) {
     const chatId = msg.chat.id
     const userId = msg.from.id
 
@@ -17,13 +15,9 @@ const deleteNote = async function(bot,connString,msg,spl) {
 
             if(status === 'administrator' || status === 'creator' || msg.chat.type === 'private') {
                 console.log(`/deleteNote called for chatId = ${chatId} and notename = ${noteName}`)
-                const pg = new postgres(connString)
+                
                 const queryString = `delete from savednotes where chat_id = '${chatId}' and notename = '${noteName}'`
-                pg.connect()
-                    .then(() => {
-                        console.log("Connected to the database")
-                        return pg.query(queryString)
-                    })
+                pool.query(queryString)
                     .then((result) => {
                         if(result.rowCount == 0) {
                             bot.sendMessage(chatId,"Note doesnot exist!")
@@ -33,12 +27,7 @@ const deleteNote = async function(bot,connString,msg,spl) {
                         }
                     })
                     .catch((error) => {
-                        console.log('Error executing the "delete" query')
-                    })
-                    .finally(() => {
-                        pg.end()
-                        .then(() => console.log('Disconnected from the database'))
-                        .catch((error) => console.error('Error disconnecting from the database:', error));
+                        console.log('Error executing the "delete" query : ' , error)
                     })
             }
             else {

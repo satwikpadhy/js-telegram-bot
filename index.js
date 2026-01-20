@@ -55,14 +55,22 @@ app.get('/health', async (req, res) => {
         // Check if pg connection is working
         const queryString = `SELECT 1`
         if (bot && me) {
-            result = await pool.query(queryString);
-            console.log(result)
-            res.status(200).json({
+            pool.query(queryString)
+                .then(() => {
+                    res.status(200).json({
                         status: 'healthy',
                         timestamp: new Date().toISOString(),
                         bot_username: me.username,
                         uptime: formatUptime(process.uptime())
                     });
+                })
+                .catch((error) => {
+                    res.status(503).json({
+                            status: 'unhealthy',
+                            timestamp: new Date().toISOString(),
+                            message: 'Postgres connection error' + error
+                        });
+                })
         }
         else {
                 res.status(503).json({
@@ -108,7 +116,7 @@ bot.on('message', (msg) => {
     }  
 
     else if(command == "/get") {
-        getNote(bot,connString,chatId,spl,encryptionKey)
+        getNote(bot,pool,chatId,spl,encryptionKey)
     }
     
     else if(command == `/notes` || command == `/notes@${me.username}`) {
@@ -116,7 +124,7 @@ bot.on('message', (msg) => {
     }
 
     else if(command == '/delete') {
-        deleteNote(bot,connString,msg,spl)
+        deleteNote(bot,pool,msg,spl)
     }
     
     else if(command == '/pin') {
@@ -158,9 +166,8 @@ bot.on('callback_query' , (cq) => {
     console.log(`Inside callback query block for chatId = ${chatId} and notename = ${noteName}`)
     let spl = ['/get',noteName]
     messageId = cq.message.message_id
-    // console.log(chatId,noteName)
+    getNote(bot,pool,chatId,spl,encryptionKey)
     bot.deleteMessage(chatId,messageId)
-    getNote(bot,connString,chatId,spl,encryptionKey)
 })
 
 // To be implemented in future releases

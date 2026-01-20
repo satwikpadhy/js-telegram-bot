@@ -1,7 +1,6 @@
-const postgres = require('pg').Client
 var CryptoJS = require("crypto-js");
 
-const getNote = function(bot,connString,chatId,spl,encryptionKey) {
+const getNote = function(bot,pool,chatId,spl,encryptionKey) {
     if(spl.length === 1) {
         console.log(`No notename specified by ${chatId} for /get`)
         bot.sendMessage(chatId, "Please Specify the Notename")
@@ -9,14 +8,9 @@ const getNote = function(bot,connString,chatId,spl,encryptionKey) {
     else {
         noteName = spl[1]
         console.log(`/getNote called for chatId = ${chatId} and notename = ${noteName}`)
-        const pg = new postgres(connString)
+        
         const queryString = `select data, type from savednotes where chat_id = '${chatId}' and notename = '${noteName}'`
-        pg.connect()
-            .then(() => {
-                console.log('Connected to the database');
-
-                return pg.query(queryString);
-            })
+        pool.query(queryString)
             .then((result) => {
                 if(result.rows.length == 0) {
                     bot.sendMessage(chatId,"Note does not exist!")
@@ -55,12 +49,6 @@ const getNote = function(bot,connString,chatId,spl,encryptionKey) {
             .catch((error) => {
                 console.error('Error executing the "get" query:', error);
             })
-            .finally(() => {
-                
-                pg.end()
-                .then(() => console.log('Disconnected from the database'))
-                .catch((error) => console.error('Error disconnecting from the database:', error));
-            });
     }
 }
 
