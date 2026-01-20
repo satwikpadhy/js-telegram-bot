@@ -47,38 +47,21 @@ const app = express();
 const PORT = process.env.PORT || 8321;
 app.use(express.json());
 
-app.get('/health', (req, res) => {
+app.get('/health', async (req, res) => {
     try {
         // Check if bot is connected
         getMe("healthCheck")
         
         // Check if pg connection is working
-        const pg = new postgres(connString)
         const queryString = `SELECT 1`
         if (bot && me) {
-            pg.connect()
-                .then(() => {
-                    // console.log("Connected to the database")
-                    return pg.query(queryString)
-                })
-                .then(() => {
-                    res.status(200).json({
+            result = await pool.query(queryString);
+            console.log(result)
+            res.status(200).json({
                         status: 'healthy',
                         timestamp: new Date().toISOString(),
                         bot_username: me.username,
                         uptime: formatUptime(process.uptime())
-                    });
-                })
-                .catch((error) => {
-                    res.status(503).json({
-                            status: 'unhealthy',
-                            timestamp: new Date().toISOString(),
-                            message: 'Postgres connection error' + error
-                        });
-                })
-                .finally(() => {
-                        pg.end()
-                            .catch((error) => console.error('Error disconnecting from the database:', error));
                     });
         }
         else {
@@ -91,7 +74,7 @@ app.get('/health', (req, res) => {
         
     } catch (error) {
         res.status(500).json({
-            status: 'error',
+            status: 'unhealthy',
             timestamp: new Date().toISOString(),
             message: error.message
         });
@@ -121,7 +104,7 @@ bot.on('message', (msg) => {
     }
 
     else if(command == "/save" || command == `/save@${me.username}`) {
-        save(bot,connString,msg,spl,encryptionKey)
+        save(bot,pool,msg,spl,encryptionKey)
     }  
 
     else if(command == "/get") {
