@@ -5,6 +5,7 @@ const formatUptime = require('./utils/formatUptime')
 const deleteNote = require('./utils/deleteNote')
 const pinMessage = require('./utils/pinMessage')
 const userManagement = require('./utils/userManagement')
+const pool = require('./utils/pool')
 require('dotenv').config()
 const TelegramBot = require('node-telegram-bot-api');
 const fs = require('fs')
@@ -14,6 +15,7 @@ var token = ''
 var connString = ''
 
 token = process.env.token
+
 connString = {
     database : process.env.database,
     user : process.env.user,
@@ -21,7 +23,6 @@ connString = {
     host : process.env.host,
     port : process.env.port
 }
-
 
 const bot = new TelegramBot(token, {polling: true})
 
@@ -128,7 +129,7 @@ bot.on('message', (msg) => {
     }
     
     else if(command == `/notes` || command == `/notes@${me.username}`) {
-        notes(bot,connString,chatId)
+        notes(bot,pool,chatId)
     }
 
     else if(command == '/delete') {
@@ -178,3 +179,25 @@ bot.on('callback_query' , (cq) => {
     bot.deleteMessage(chatId,messageId)
     getNote(bot,connString,chatId,spl,encryptionKey)
 })
+
+// To be implemented in future releases
+
+// bot.on('new_chat_members', (info) => {
+//     console.log(info)
+//     var chat_id = info.chat.id
+//     var added_by = info.from.id
+//     var user_id = info.new_chat_participant.id
+//     var username = info.new_chat_participant.username
+//     var is_bot = info.new_chat_participant.is_bot
+//     console.log(chat_id,added_by,user_id,username,is_bot)
+// })
+
+// bot.on('left_chat_member', (info) => {
+//     console.log(info)
+//     var chat_id = info.chat.id
+//     var added_by = info.from.id
+//     var user_id = info.new_chat_participant.id
+//     var username = info.new_chat_participant.username
+//     var is_bot = info.new_chat_participant.is_bot
+//     console.log(chat_id,added_by,user_id,username,is_bot)
+// })
