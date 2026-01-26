@@ -160,14 +160,18 @@ bot.on('message', (msg) => {
   }
 });
 
-bot.on('callback_query' , (cq) => {
+bot.on('callback_query' , async (cq) => {
     chatId = cq.message.chat.id
     noteName = cq.data
     console.log(`Inside callback query block for chatId = ${chatId} and notename = ${noteName}`)
     let spl = ['/get',noteName]
     messageId = cq.message.message_id
-    getNote(bot,pool,chatId,spl,encryptionKey)
-    bot.deleteMessage(chatId,messageId)
+    try {
+        await bot.deleteMessage(chatId,messageId)
+        getNote(bot,pool,chatId,spl,encryptionKey)
+    } catch (error) {
+        bot.sendMessage(chatId,"Sorry, I cannot interact with messages older than 48 hours due to Telegram limitations.")
+    }
 })
 
 // To be implemented in future releases
