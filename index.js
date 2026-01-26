@@ -5,6 +5,7 @@ const formatUptime = require('./utils/formatUptime')
 const deleteNote = require('./utils/deleteNote')
 const pinMessage = require('./utils/pinMessage')
 const userManagement = require('./utils/userManagement')
+const pool = require('./utils/pool')
 require('dotenv').config()
 const TelegramBot = require('node-telegram-bot-api');
 const fs = require('fs')
@@ -14,6 +15,7 @@ var token = ''
 var connString = ''
 
 token = process.env.token
+
 connString = {
     database : process.env.database,
     user : process.env.user,
@@ -21,7 +23,6 @@ connString = {
     host : process.env.host,
     port : process.env.port
 }
-
 
 const bot = new TelegramBot(token, {polling: true})
 
@@ -46,20 +47,15 @@ const app = express();
 const PORT = process.env.PORT || 8321;
 app.use(express.json());
 
-app.get('/health', (req, res) => {
+app.get('/health', async (req, res) => {
     try {
         // Check if bot is connected
         getMe("healthCheck")
         
         // Check if pg connection is working
-        const pg = new postgres(connString)
         const queryString = `SELECT 1`
         if (bot && me) {
-            pg.connect()
-                .then(() => {
-                    // console.log("Connected to the database")
-                    return pg.query(queryString)
-                })
+            pool.query(queryString)
                 .then(() => {
                     res.status(200).json({
                         status: 'healthy',
@@ -75,10 +71,6 @@ app.get('/health', (req, res) => {
                             message: 'Postgres connection error' + error
                         });
                 })
-                .finally(() => {
-                        pg.end()
-                            .catch((error) => console.error('Error disconnecting from the database:', error));
-                    });
         }
         else {
                 res.status(503).json({
@@ -90,7 +82,7 @@ app.get('/health', (req, res) => {
         
     } catch (error) {
         res.status(500).json({
-            status: 'error',
+            status: 'unhealthy',
             timestamp: new Date().toISOString(),
             message: error.message
         });
@@ -120,19 +112,19 @@ bot.on('message', (msg) => {
     }
 
     else if(command == "/save" || command == `/save@${me.username}`) {
-        save(bot,connString,msg,spl,encryptionKey)
+        save(bot,pool,msg,spl,encryptionKey)
     }  
 
     else if(command == "/get") {
-        getNote(bot,connString,chatId,spl,encryptionKey)
+        getNote(bot,pool,chatId,spl,encryptionKey)
     }
     
     else if(command == `/notes` || command == `/notes@${me.username}`) {
-        notes(bot,connString,chatId)
+        notes(bot,pool,chatId)
     }
 
     else if(command == '/delete') {
-        deleteNote(bot,connString,msg,spl)
+        deleteNote(bot,pool,msg,spl)
     }
     
     else if(command == '/pin') {
@@ -174,7 +166,28 @@ bot.on('callback_query' , (cq) => {
     console.log(`Inside callback query block for chatId = ${chatId} and notename = ${noteName}`)
     let spl = ['/get',noteName]
     messageId = cq.message.message_id
-    // console.log(chatId,noteName)
+    getNote(bot,pool,chatId,spl,encryptionKey)
     bot.deleteMessage(chatId,messageId)
-    getNote(bot,connString,chatId,spl,encryptionKey)
 })
+
+// To be implemented in future releases
+
+// bot.on('new_chat_members', (info) => {
+//     console.log(info)
+//     var chat_id = info.chat.id
+//     var added_by = info.from.id
+//     var user_id = info.new_chat_participant.id
+//     var username = info.new_chat_participant.username
+//     var is_bot = info.new_chat_participant.is_bot
+//     console.log(chat_id,added_by,user_id,username,is_bot)
+// })
+
+// bot.on('left_chat_member', (info) => {
+//     console.log(info)
+//     var chat_id = info.chat.id
+//     var added_by = info.from.id
+//     var user_id = info.new_chat_participant.id
+//     var username = info.new_chat_participant.username
+//     var is_bot = info.new_chat_participant.is_bot
+//     console.log(chat_id,added_by,user_id,username,is_bot)
+// })

@@ -1,65 +1,44 @@
 const postgres = require('pg').Client;
 var CryptoJS = require("crypto-js");
 
-const updateDB = function(bot,connString,chatId, noteName, data, type) {
+const updateDB = function(bot,pool,chatId, noteName, data, type) {
     console.log("update db called")
-    const pg = new postgres(connString)
+    
     const queryString = `update savednotes set data = '${data}', type = '${type}' where chat_id = '${chatId}' and notename = '${noteName}'`
-    pg.connect()
-        .then(() => {
-            console.log("Connected to the database")
-            return pg.query(queryString)
-        })
+    pool.query(queryString)
         .then((result) => {
             bot.sendMessage(chatId, "Note Updated Successfully!")
-            pg.end()
-                .then(() => console.log('Disconnected from the database 3'))
-                .catch((error) => console.error('Error disconnecting from the database:', error))
         })
         .catch( async (error) => {
             console.error('Error executing update query:', error)
         })
         .finally(() => {
-            pg.end()
-                .then(() => console.log('Disconnected from the database'))
-                .catch((error) => console.error('Error disconnecting from the database:', error));
-            console.log("Exiting WriteDB Function")
+            console.log("Exiting updateDB Function")
         });
 }
 
-const writeDB = function(bot,connString,chatId, noteName, data, type) {
+const writeDB = function(bot,pool,chatId, noteName, data, type) {
     console.log(`/save called for chatId = ${chatId} and notename = ${noteName}`)
-    const pg = new postgres(connString)
+    // const pg = new postgres(connString)
     const queryString = `insert into savednotes values('${chatId}', '${noteName}', '${data}', '${type}')`
-    pg.connect()
-        .then(() => {
-            console.log('Connected to the database')
-            return pg.query(queryString)
-        })
+    pool.query(queryString)
         .then((result) => {
             // Handle query result
             bot.sendMessage(chatId, "Note Saved Successfully!")
-            pg.end()
-                .then(() => console.log('Disconnected from the database 1'))
-                .catch((error) => console.error('Error disconnecting from the database:', error))
         })
         .catch( async (error) => {
             console.log(`error = ${error.code}`)
 
             if(error.code == 23505) { 
                 //Error code 23505 occurs when unique constraint is violated. i.e note already exists
-                await pg.end().then(() => console.log("Disconnected from the database 2"))
-                updateDB(bot,connString,chatId, noteName, data, type)
+                updateDB(bot,pool,chatId, noteName, data, type)
             }
             else {
                 console.error('Error executing insert query:', error)
             }
         })
         .finally(() => {
-            pg.end()
-                .then(() => console.log('Disconnected from the database'))
-                .catch((error) => console.error('Error disconnecting from the database:', error));
-            console.log("Exiting WriteDB Function")
+            console.log("Exiting writeDB Function")
         });
 }
 
