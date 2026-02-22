@@ -14,7 +14,7 @@ const notes = function(bot,pool,chatId) {
                         for(i=1;i<=result.rows.length;i++) {
                             let button = {'text' : result.rows[i-1].notename, 'callback_data' : result.rows[i-1].notename}
                             rows.push(button)
-                            if(i%3 == 0 && i != 1) {
+                            if(i%2 == 0 && i != 1) {
                                 keyboard.push(rows)
                                 rows = []
                             }
