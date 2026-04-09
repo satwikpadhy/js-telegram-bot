@@ -162,14 +162,46 @@ bot.on('message', (msg) => {
 
 bot.on('callback_query' , async (cq) => {
     chatId = cq.message.chat.id
-    noteName = cq.data
-    console.log(`Inside callback query block for chatId = ${chatId} and notename = ${noteName}`)
-    let spl = ['/get',noteName]
+    callbackData = cq.data
+    console.log(`Inside callback query block for chatId = ${chatId} and callback data = ${callbackData}`)
+    let spl = callbackData.split(" ")
     messageId = cq.message.message_id
+
     try {
-        await bot.deleteMessage(chatId,messageId)
-        getNote(bot,pool,chatId,spl,encryptionKey)
+        if(spl[0] === '/get') {
+            await bot.deleteMessage(chatId,messageId) //To be changed to edit message in the future releases.
+            getNote(bot,pool,chatId,spl,encryptionKey)
+        }
+        else if(spl[0] == '/delete') {
+            if(spl.length === 2) {
+                let row = []
+                let keyboard = []
+                row.push({'text' : "Yes", 'callback_data' : "/delete " + spl[1] + " confirmed"})
+                row.push({'text' : "No", 'callback_data' : "/delete " + spl[1] + " aborted"})
+                keyboard.push(row)
+                let editOptions = {'message_id' : messageId, 'chat_id' : chatId, 'reply_markup' : {'inline_keyboard' : keyboard}}
+                bot.editMessageText(
+                    "You are going to delete the note named\n**" + 
+                    spl[1] + 
+                    "**\n\nAre You Sure???", editOptions
+                )
+            }
+            else if(spl.length === 3) {
+                if(spl[2] === 'confirmed') {
+                    const deleteReply = await deleteNote(bot,pool,cq.message,spl)
+                    console.log("deleteReply :" + deleteReply)
+                    let editOptions = {'message_id' : messageId, 'chat_id' : chatId}
+                    bot.editMessageText(deleteReply,editOptions)
+                }
+                else {
+                    let editOptions = {'message_id' : messageId, 'chat_id' : chatId}
+                    bot.editMessageText("Delete Aborted", editOptions)
+                }
+            }
+        }
+            
     } catch (error) {
+        console.log(error)
         bot.sendMessage(chatId,"Sorry, I cannot interact with messages older than 48 hours due to Telegram limitations.")
     }
 })
