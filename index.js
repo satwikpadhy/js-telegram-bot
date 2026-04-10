@@ -169,11 +169,14 @@ bot.on('callback_query' , async (cq) => {
 
     try {
         if(spl[0] === '/get') {
+            bot.answerCallbackQuery(cq.id, {text: "Fetching your note...", show_alert: false})
             await bot.deleteMessage(chatId,messageId) //To be changed to edit message in the future releases.
             getNote(bot,pool,chatId,spl,encryptionKey)
         }
         else if(spl[0] == '/delete') {
+            // bot.answerCallbackQuery(cq.id, {text: "Processing delete request...", show_alert: false})
             if(spl.length === 2) {
+                bot.answerCallbackQuery(cq.id, {text: "⚠️ Confirm deletion ⚠️", show_alert: true})
                 let row = []
                 let keyboard = []
                 row.push({'text' : "Yes", 'callback_data' : "/delete " + spl[1] + " confirmed"})
@@ -188,12 +191,14 @@ bot.on('callback_query' , async (cq) => {
             }
             else if(spl.length === 3) {
                 if(spl[2] === 'confirmed') {
+                    bot.answerCallbackQuery(cq.id, {text: "Deleting note...", show_alert: false})
                     const deleteReply = await deleteNote(bot,pool,cq.message,spl)
                     console.log("deleteReply :" + deleteReply)
                     let editOptions = {'message_id' : messageId, 'chat_id' : chatId}
                     bot.editMessageText(deleteReply,editOptions)
                 }
                 else {
+                    bot.answerCallbackQuery(cq.id, {text: "Deletion cancelled", show_alert: false})
                     let editOptions = {'message_id' : messageId, 'chat_id' : chatId}
                     bot.editMessageText("Delete Aborted", editOptions)
                 }
