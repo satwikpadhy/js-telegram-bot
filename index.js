@@ -174,7 +174,6 @@ bot.on('callback_query' , async (cq) => {
             getNote(bot,pool,chatId,spl,encryptionKey)
         }
         else if(spl[0] == '/delete') {
-            // bot.answerCallbackQuery(cq.id, {text: "Processing delete request...", show_alert: false})
             if(spl.length === 2) {
                 bot.answerCallbackQuery(cq.id, {text: "⚠️ Confirm deletion ⚠️", show_alert: true})
                 let row = []

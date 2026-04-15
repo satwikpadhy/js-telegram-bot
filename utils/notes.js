@@ -1,9 +1,9 @@
 const notes = function(bot,pool,chatId) {
     console.log(`/notes called for ${chatId}`)
-    const queryString = `select * from savednotes where chat_id = '${chatId}' order by lower(notename)`
+    const queryString = `select * from savednotes where chat_id = $1 order by lower(notename)`
 
     try {
-        pool.query(queryString)
+        pool.query(queryString,[chatId])
             .then((result) =>    {
                 if(result.rowCount == 0) {
                     bot.sendMessage(chatId, "There are no saved notes in this chat. Use /save to get started")

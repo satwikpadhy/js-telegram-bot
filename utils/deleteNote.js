@@ -5,10 +5,10 @@ const deleteNote = async function(bot,pool,msg,spl) {
 
     if(spl.length === 1) {
         console.log(`/delete called for ${chatId} withour parameters`)
-        const queryString = `select * from savednotes where chat_id = '${chatId}' order by lower(notename)`
+        const queryString = `select * from savednotes where chat_id = $1 order by lower(notename)`
 
         try {
-            pool.query(queryString)
+            pool.query(queryString,[chatId])
                 .then((result) =>    {
                     if(result.rowCount == 0) {
                         resultReply = "There are no saved notes in this chat. Use /save to get started"
@@ -45,8 +45,9 @@ const deleteNote = async function(bot,pool,msg,spl) {
             if(status === 'administrator' || status === 'creator' || msg.chat.type === 'private') {
                 console.log(`/deleteNote called for chatId = ${chatId} and notename = ${noteName}`)
                 
-                const queryString = `delete from savednotes where chat_id = '${chatId}' and notename = '${noteName}'`
-                await pool.query(queryString)
+                // const queryString = `delete from savednotes where chat_id = '${chatId}' and notename = '${noteName}'`
+                const queryString = `delete from savednotes where chat_id = $1 and notename = $2`
+                await pool.query(queryString,[chatId,noteName])
                     .then((result) => {
                         
                         if(result.rowCount == 0) {

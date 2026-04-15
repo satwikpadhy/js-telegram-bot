@@ -4,8 +4,8 @@ var CryptoJS = require("crypto-js");
 const updateDB = function(bot,pool,chatId, noteName, data, type) {
     console.log("update db called")
     
-    const queryString = `update savednotes set data = '${data}', type = '${type}' where chat_id = '${chatId}' and notename = '${noteName}'`
-    pool.query(queryString)
+    const queryString = `update savednotes set data = $1, type = $2 where chat_id = $3 and notename = $4`
+    pool.query(queryString,[data,type,chatId,noteName])
         .then((result) => {
             bot.sendMessage(chatId, "Note Updated Successfully!")
         })
@@ -19,9 +19,8 @@ const updateDB = function(bot,pool,chatId, noteName, data, type) {
 
 const writeDB = function(bot,pool,chatId, noteName, data, type) {
     console.log(`/save called for chatId = ${chatId} and notename = ${noteName}`)
-    // const pg = new postgres(connString)
-    const queryString = `insert into savednotes values('${chatId}', '${noteName}', '${data}', '${type}')`
-    pool.query(queryString)
+    const queryString = `insert into savednotes values($1,$2,$3,$4)`
+    pool.query(queryString,[chatId,noteName,data,type])
         .then((result) => {
             // Handle query result
             bot.sendMessage(chatId, "Note Saved Successfully!")
@@ -86,6 +85,7 @@ const Save = async function(bot,connString,msg, spl,encryptionKey) {
                     type = "voice"
                 }
                 console.log(`chatId = ${chatId}, notename = ${noteName}, data = ${data}, doctype = ${type}`)
+                data = String(data) // Convert Data to String
                 writeDB(bot,connString,chatId,noteName,data,type)
             }
             else {

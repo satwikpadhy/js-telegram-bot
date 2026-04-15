@@ -8,9 +8,8 @@ const getNote = function(bot,pool,chatId,spl,encryptionKey) {
     else {
         noteName = spl[1]
         console.log(`/getNote called for chatId = ${chatId} and notename = ${noteName}`)
-        
-        const queryString = `select data, type from savednotes where chat_id = '${chatId}' and notename = '${noteName}'`
-        pool.query(queryString)
+        const queryString = `select data, type from savednotes where chat_id = $1 and notename = $2`
+        pool.query(queryString,[chatId,noteName])
             .then((result) => {
                 if(result.rows.length == 0) {
                     bot.sendMessage(chatId,"Note does not exist!")
