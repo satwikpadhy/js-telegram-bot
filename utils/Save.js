@@ -58,7 +58,11 @@ const Save = async function(bot,connString,msg, spl,encryptionKey) {
 
             if(status === 'administrator' || status === 'creator' || msg.chat.type === 'private') {
                 //Code to get the data type and Set the variables accordingly
-                if("photo" in msg.reply_to_message) {
+                if(!msg.reply_to_message) {
+                    bot.sendMessage(chatId, "Please reply to the message which you want to save with this command")
+                    return
+                } 
+                else if("photo" in msg.reply_to_message) {
                     data = msg.reply_to_message.photo[3].file_id 
                     //photo[3] had the highest resolution. Thats why it was selected.
                     type = "img"
