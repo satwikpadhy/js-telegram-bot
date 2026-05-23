@@ -19,4 +19,4 @@ const formatUptime = function(seconds) {
         return "0 seconds";
     }
 
-module.exports = formatUptime
+export default formatUptime

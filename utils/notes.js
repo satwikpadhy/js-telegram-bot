@@ -6,12 +6,12 @@ const notes = function(bot,pool,chatId) {
         pool.query(queryString,[chatId])
             .then((result) =>    {
                 if(result.rowCount == 0) {
-                    bot.sendMessage(chatId, "There are no saved notes in this chat. Use /save to get started")
+                    bot.api.sendMessage(chatId, "There are no saved notes in this chat. Use /save to get started")
                 }
                 else {
                         let rows = []
                         let keyboard = []
-                        for(i=1;i<=result.rows.length;i++) {
+                        for(var i=1;i<=result.rows.length;i++) {
                             let button = {'text' : result.rows[i-1].notename, 'callback_data' : "/get " + result.rows[i-1].notename}
                             rows.push(button)
                             if(i%2 == 0 && i != 1) {
@@ -22,7 +22,7 @@ const notes = function(bot,pool,chatId) {
                         keyboard.push(rows)
                         let inlineKeyboardMarkup = {'reply_markup' : {'inline_keyboard' : keyboard}}
                         let text = 'Notes in this chat :'
-                        bot.sendMessage(chatId, text, inlineKeyboardMarkup)
+                        bot.api.sendMessage(chatId, text, inlineKeyboardMarkup)
                     }
             })
     }
@@ -31,4 +31,4 @@ const notes = function(bot,pool,chatId) {
     }
 }
 
-module.exports = notes
+export default notes

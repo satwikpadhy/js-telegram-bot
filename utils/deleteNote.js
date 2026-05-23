@@ -1,7 +1,8 @@
 const deleteNote = async function(bot,pool,msg,spl) {
     const chatId = msg.chat.id
     const userId = msg.from.id
-    var resultReply = ""
+    let resultReply
+    let noteName
 
     if(spl.length === 1) {
         console.log(`/delete called for ${chatId} withour parameters`)
@@ -16,7 +17,7 @@ const deleteNote = async function(bot,pool,msg,spl) {
                     else {
                             let rows = []
                             let keyboard = []
-                            for(i=1;i<=result.rows.length;i++) {
+                            for(let i=1;i<=result.rows.length;i++) {
                                 let button = {'text' : result.rows[i-1].notename, 'callback_data' : "/delete " + result.rows[i-1].notename}
                                 rows.push(button)
                                 if(i%2 == 0 && i != 1) {
@@ -27,7 +28,7 @@ const deleteNote = async function(bot,pool,msg,spl) {
                             keyboard.push(rows)
                             let inlineKeyboardMarkup = {'reply_markup' : {'inline_keyboard' : keyboard}}
                             let text = 'Notes in this chat :'
-                            bot.sendMessage(chatId, text, inlineKeyboardMarkup)
+                            bot.api.sendMessage(chatId, text, inlineKeyboardMarkup)
                         }
                 })
         }
@@ -39,7 +40,7 @@ const deleteNote = async function(bot,pool,msg,spl) {
         try {
             //Replacing all single quotes with two single quotes so as to escape the single quote when putting it into the SQL
             noteName = spl[1].replace(/\'/g, `''`) 
-            const userRole = await bot.getChatMember(chatId, userId)
+            const userRole = await bot.api.getChatMember(chatId, userId)
             const status = userRole.status
 
             if(status === 'administrator' || status === 'creator' || msg.chat.type === 'private') {
@@ -70,9 +71,9 @@ const deleteNote = async function(bot,pool,msg,spl) {
         }
     }
     else
-        bot.sendMessage(chatId, "Please delete using the /delete command. \"/delete notename\" is not supported anymore")
+        bot.api.sendMessage(chatId, "Please delete using the /delete command. \"/delete notename\" is not supported anymore")
 
     return resultReply
 }
 
-module.exports = deleteNote
+export default deleteNote

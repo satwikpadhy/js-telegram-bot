@@ -1,4 +1,4 @@
-const postgres = require('pg').Client
+import { Client } from 'pg'
 
 const banUser = async function(bot,msg) {
     chat_id = msg.chat.id
@@ -187,7 +187,7 @@ const removeWarn = async function(bot,connString,msg) {
     }
 }
 
-module.exports = {
+export default {
     banUser, 
     unbanUser,
     warnUser,

@@ -1,5 +1,4 @@
-const postgres = require('pg').Client;
-var CryptoJS = require("crypto-js");
+import CryptoJS from 'crypto-js'
 
 const updateDB = function(bot,pool,chatId, noteName, data, type) {
     console.log("update db called")
@@ -7,7 +6,7 @@ const updateDB = function(bot,pool,chatId, noteName, data, type) {
     const queryString = `update savednotes set data = $1, type = $2 where chat_id = $3 and notename = $4`
     pool.query(queryString,[data,type,chatId,noteName])
         .then((result) => {
-            bot.sendMessage(chatId, "Note Updated Successfully!")
+            bot.api.sendMessage(chatId, "Note Updated Successfully!")
         })
         .catch( async (error) => {
             console.error('Error executing update query:', error)
@@ -23,7 +22,7 @@ const writeDB = function(bot,pool,chatId, noteName, data, type) {
     pool.query(queryString,[chatId,noteName,data,type])
         .then((result) => {
             // Handle query result
-            bot.sendMessage(chatId, "Note Saved Successfully!")
+            bot.api.sendMessage(chatId, "Note Saved Successfully!")
         })
         .catch( async (error) => {
             console.log(`error = ${error.code}`)
@@ -46,20 +45,23 @@ const Save = async function(bot,connString,msg, spl,encryptionKey) {
     const userId = msg.from.id
     let data
     let type
+    let noteName
+    let key
 	if(spl.length === 1) {
-		bot.sendMessage(chatId, "Please Specify the Notename")
+		bot.api.sendMessage(chatId, "Please Specify the Notename")
 	}
 	else {
         try {
             //Replacing all single quotes with two single quotes so as to escape the single quote when putting it into the SQL
             noteName = spl[1].replace(/\'/g, `''`) 
-            const userRole = await bot.getChatMember(chatId, userId)
+            const userRole = await bot.api.getChatMember(chatId, userId)
             const status = userRole.status
+            console.log(status)
 
             if(status === 'administrator' || status === 'creator' || msg.chat.type === 'private') {
                 //Code to get the data type and Set the variables accordingly
                 if(!msg.reply_to_message) {
-                    bot.sendMessage(chatId, "Please reply to the message which you want to save with this command")
+                    bot.api.sendMessage(chatId, "Please reply to the message which you want to save with this command")
                     return
                 } 
                 else if("photo" in msg.reply_to_message) {
@@ -93,7 +95,7 @@ const Save = async function(bot,connString,msg, spl,encryptionKey) {
                 writeDB(bot,connString,chatId,noteName,data,type)
             }
             else {
-                bot.sendMessage(chatId, "Sorry, non-admins cannot use this command")
+                bot.api.sendMessage(chatId, "Sorry, non-admins cannot use this command")
             }
         }
         catch(err)
@@ -105,4 +107,4 @@ const Save = async function(bot,connString,msg, spl,encryptionKey) {
 
 
 
-module.exports = Save
+export default Save

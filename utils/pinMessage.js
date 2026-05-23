@@ -2,26 +2,27 @@ const pinMessage = async function(bot,msg) {
     console.log(`/pin called for ${msg.chat.id}`)
     const chatId = msg.chat.id
     const userId = msg.from.id
-    const userRole = await bot.getChatMember(chatId, userId)
+    const userRole = await bot.api.getChatMember(chatId, userId)
     const status = userRole.status
+    // console.log(chatId, userId, status)
 
     if(status === 'administrator' || status === 'creator' || msg.chat.type === 'private') {
         try {
-            msg_to_pin = msg.reply_to_message.message_id
-            bot.pinChatMessage(msg.chat.id,msg_to_pin)
+            const msg_to_pin = msg.reply_to_message.message_id
+            bot.api.pinChatMessage(msg.chat.id,msg_to_pin)
             .then(() =>{
-                bot.sendMessage(msg.chat.id,"Message Pinned Successfully!")
+                bot.api.sendMessage(msg.chat.id,"Message Pinned Successfully!")
             })
             .catch((error) => {
                 console.error('Error pinning the message:', error);
             })
         }
         catch {
-            bot.sendMessage(chatId,"Please reply to a message you want to pin")
+            bot.api.sendMessage(chatId,"Please reply to a message you want to pin")
         }
     }
     else {
-        bot.sendMessage(chatId, "Sorry, non-admins cannot use this command")
+        bot.api.sendMessage(chatId, "Sorry, non-admins cannot use this command")
     }
 }
 
@@ -29,25 +30,25 @@ const unpinMessage = async function(bot,msg) {
     console.log(`/unpin called for ${msg.chat.id}`)
     const chatId = msg.chat.id
     const userId = msg.from.id
-    const userRole = await bot.getChatMember(chatId, userId)
+    const userRole = await bot.api.getChatMember(chatId, userId)
     const status = userRole.status
 
     if(status === 'administrator' || status === 'creator' || msg.chat.type === 'private') {
-        bot.unpinChatMessage(msg.chat.id)
+        bot.api.unpinChatMessage(msg.chat.id)
             .then(() =>{
-                bot.sendMessage(msg.chat.id,"Message Unpinned Successfully!")
+                bot.api.sendMessage(msg.chat.id,"Message Unpinned Successfully!")
             })
             .catch((error) => {
                 // console.error('Error unpinning the message:', error);
-                bot.sendMessage(msg.chat.id, "Error in unpinning the message. Perhaps there was no message to unpin?")
+                bot.api.sendMessage(msg.chat.id, "Error in unpinning the message. Perhaps there was no message to unpin?")
             })
     }
     else {
-        bot.sendMessage(chatId, "Sorry, non-admins cannot use this command")
+        bot.api.sendMessage(chatId, "Sorry, non-admins cannot use this command")
     }
 }
 
-module.exports = {
+export default {
     pinMessage,
     unpinMessage
 }
