@@ -85,88 +85,81 @@ app.listen(PORT, () => {
     console.log(`Health check server running on port ${PORT}`);
 });
 
-
-/*
-bot.command("pin", async (ctx) => {
-    // 1. Send the message first
-    const sentMessage = await ctx.reply("This is the message I am going to pin!");
-
-    // 2. Pin that message using its ID and the chat ID
-    await ctx.api.pinChatMessage(ctx.chat.id, sentMessage.message_id);
+bot.command("start", async (ctx) => {
+    ctx.reply(`Hello I am @${me.username} v2. Send /help to get a list of commands.`);
 });
 
-Migrate the code to this
+bot.command("help", async (ctx) => {
+    ctx.reply(helpText.replace("${me}", `${me.username}`));
+});
 
-
-Also implement gramy error handling.
-*/
-
-bot.on('message', (ctx) => {
-    const chatId = ctx.chat.id
+bot.command("save", async (ctx) => {
     var msg = ctx.message
-
     if("text" in msg) {
         const text = msg.text 
         var spl = text.split(" ")
-        var command = spl[0]
-
-        if(command == "/start") {
-            bot.api.sendMessage(chatId, `Hello I am @${me.username}. Send /help to get a list of commands.`)
-        }
-
-        else if(command == "/help" || command ==`/help@${me.username}`) {
-            bot.api.sendMessage(chatId, helpText.replace("${me}", `${me.username}`))
-        }
-
-        else if(command == "/save" || command == `/save@${me.username}`) {
-            save(bot, pool, msg, spl, encryptionKey)
-        }  
-
-        else if(command == "/get") {
-            getNote(bot,pool,chatId,spl,encryptionKey)
-        }
-        
-        else if(command == `/notes` || command == `/notes@${me.username}`) {
-            notes(bot,pool,chatId)
-        }
-
-        else if(command == '/delete') {
-            deleteNote(bot,pool,msg,spl)
-        }
-        
-        else if(command == '/pin') {
-            pinMessage.pinMessage(bot,msg)
-        }
-
-        else if(command == '/unpin') {
-            pinMessage.unpinMessage(bot,msg)
-        }
-
-        else if(msg.chat.type != 'private' && 1===2) { //Temporarily disable group features
-
-            if(command == '/ban') {
-                userManagement.banUser(bot,msg)
-            }
-            
-            else if(command == '/unban') {
-                userManagement.unbanUser(bot,msg)
-            }
-
-            else if(command == '/warn') {
-                userManagement.warnUser(bot, connString, msg)
-                //Check if not using connString is possible
-            }
-
-            else if(command == '/unwarn') {
-                userManagement.removeWarn(bot, connString, msg)
-                //Check if not using connString is possible
-            }
-            
-            else if(command == '/kick') {
-                userManagement.kickUser(bot,msg)
-            }
-        }
     }
+    save(bot, pool, msg, spl, encryptionKey)
+});
+
+bot.command("get", async (ctx) => {
+    const chatId = ctx.chat.id
+    var msg = ctx.message
+    if("text" in msg) {
+        const text = msg.text 
+        var spl = text.split(" ")
+    }
+    getNote(bot, pool, chatId, spl, encryptionKey)
+});
+
+bot.command("notes", async (ctx) => {
+    const chatId = ctx.chat.id
+    notes(bot,pool,chatId)
+});
+
+bot.command("delete", async (ctx) => {
+    var msg = ctx.message
+    if("text" in msg) {
+        const text = msg.text 
+        var spl = text.split(" ")
+    }
+    deleteNote(bot, pool, msg, spl)
+});
+
+bot.command("pin", async (ctx) => {
+    var msg = ctx.message
+    pinMessage.pinMessage(bot,msg)
+});
+
+bot.command("unpin", async (ctx) => {
+    var msg = ctx.message
+    pinMessage.unpinMessage(bot, msg)
+});
+
+//Add detection of private vs group chats in future releases and restrict these commands to group chats only. For now, these commands will be available in all types of chats but will only work in groups.
+bot.command("ban", async (ctx) => {
+    var msg = ctx.message
+    userManagement.banUser(bot, msg)
+});
+
+bot.command("unban", async (ctx) => {
+    var msg = ctx.message
+    userManagement.unbanUser(bot, msg)
+});
+
+bot.command("warn", async (ctx) => {
+    var msg = ctx.message
+    userManagement.warnUser(bot, connString, msg)
+});
+
+bot.command("unwarn", async (ctx) => {
+    var msg = ctx.message
+    userManagement.removeWarn(bot, connString, msg)
+});
+
+bot.command("kick", async (ctx) => {
+    var msg = ctx.message
+    userManagement.kickUser(bot, msg)
 });
 
 bot.on('callback_query', async (ctx) => {
@@ -245,13 +238,5 @@ bot.start()
 
 bot.catch((err) => {
   const ctx = err.ctx;
-  console.error(`Error while handling update ${ctx.update.update_id}:`);
-  const e = err.error;
-  if (e instanceof GrammyError) {
-    console.error("Error in request:", e.description);
-  } else if (e instanceof HttpError) {
-    console.error("Could not contact Telegram:", e);
-  } else {
-    console.error("Unknown error:", e);
-  }
+  console.error(err.error);
 });
