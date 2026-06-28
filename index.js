@@ -13,14 +13,6 @@ import express from 'express'
 import { Bot } from "grammy";
 var token = process.env.token
 
-var connString = {
-    database : process.env.database,
-    user : process.env.user,
-    password : process.env.password,
-    host : process.env.host,
-    port : process.env.port
-}
-
 const bot = new Bot(token)
 
 
@@ -136,29 +128,48 @@ bot.command("unpin", async (ctx) => {
     pinMessage.unpinMessage(bot, msg)
 });
 
-//Add detection of private vs group chats in future releases and restrict these commands to group chats only. For now, these commands will be available in all types of chats but will only work in groups.
 bot.command("ban", async (ctx) => {
     var msg = ctx.message
+    if (msg.chat.type === 'private') {
+        ctx.reply("This command only works in group chats")
+        return
+    }
     userManagement.banUser(bot, msg)
 });
 
 bot.command("unban", async (ctx) => {
     var msg = ctx.message
+    if (msg.chat.type === 'private') {
+        ctx.reply("This command only works in group chats")
+        return
+    }
     userManagement.unbanUser(bot, msg)
 });
 
 bot.command("warn", async (ctx) => {
     var msg = ctx.message
-    userManagement.warnUser(bot, connString, msg)
+    if (msg.chat.type === 'private') {
+        ctx.reply("This command only works in group chats")
+        return
+    }
+    userManagement.warnUser(bot, pool, msg)
 });
 
 bot.command("unwarn", async (ctx) => {
     var msg = ctx.message
-    userManagement.removeWarn(bot, connString, msg)
+    if (msg.chat.type === 'private') {
+        ctx.reply("This command only works in group chats")
+        return
+    }
+    userManagement.removeWarn(bot, pool, msg)
 });
 
 bot.command("kick", async (ctx) => {
     var msg = ctx.message
+    if (msg.chat.type === 'private') {
+        ctx.reply("This command only works in group chats")
+        return
+    }
     userManagement.kickUser(bot, msg)
 });
 
@@ -207,12 +218,13 @@ bot.on('callback_query', async (ctx) => {
             
     } catch (error) {
         console.log(error)
-        // bot.api.sendMessage(chatId,"Sorry, I cannot interact with messages older than 48 hours due to Telegram limitations.")
         ctx.reply("Sorry, I cannot interact with messages older than 48 hours due to Telegram limitations.")
     }
 })
 
 // To be implemented in future releases
+// 
+// Also add collecting user_id along with the username to database when a new user joins.
 
 // bot.on('new_chat_members', (info) => {
 //     console.log(info)
